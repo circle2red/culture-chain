@@ -1,0 +1,47 @@
+# 依赖
+node_modules/
+.pnp
+.pnp.js
+
+# 构建产物
+.next/
+out/
+dist/
+build/
+artifacts/
+cache/
+typechain-types/
+
+# 环境变量（绝不提交）
+.env
+.env.local
+.env.*.local
+
+# 数据库
+*.db
+*.sqlite
+
+# 日志
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 编辑器
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Turborepo
+.turbo/
+
+# Vercel
+.vercel/
+
+# 测试覆盖率
+coverage/
+
+# Hardhat 部署产物（地址记录在 sdk，不提交 ignition 缓存）
+ignition/deployments/
