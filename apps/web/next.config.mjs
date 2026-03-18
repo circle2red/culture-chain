@@ -1,6 +1,5 @@
-import type { NextConfig } from "next"
-
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   transpilePackages: ["@culture-chain/ui", "@culture-chain/sdk"],
   images: {
     remotePatterns: [
@@ -18,9 +17,13 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "arweave.net",
       },
+      // 开发阶段 mock 数据图片（生产时可移除）
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
     ],
   },
-  // 禁止 Server Actions 在生产中意外暴露
   experimental: {
     serverActions: {
       allowedOrigins: ["localhost:3000"],

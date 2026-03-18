@@ -12,20 +12,19 @@
 
 ## 本地开发环境
 
+> 详见 [快速启动指南](./quickstart.md)，支持「极速模式（纯 mock）」和「完整模式」两种启动方式。
+
 ```bash
-# 1. 启动本地区块链 + 部署合约
-cd apps/contracts
-pnpm hardhat node          # 在 localhost:8545 启动
-pnpm hardhat run scripts/deploy.ts --network localhost
+# 极速启动（无需 Docker / 区块链节点）
+cp .env.local.example .env.local   # 填写 NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID
+pnpm install
+pnpm dev                            # 访问 http://localhost:3000
 
-# 2. 启动数据库
-docker-compose up -d postgres meilisearch
-
-# 3. 数据库迁移
-pnpm db:migrate
-
-# 4. 启动前端
-cd apps/web
+# 完整启动（含数据库 + 本地链）
+docker compose up -d               # 启动 PostgreSQL + Meilisearch
+pnpm db:migrate                    # 初始化数据库
+pnpm --filter @culture-chain/contracts hardhat node &   # 启动本地链
+pnpm contracts:deploy:local        # 部署合约
 pnpm dev
 ```
 
@@ -69,10 +68,26 @@ vercel --prod
 
 ---
 
-## 基础设施（Docker Compose 生产配置）
+## 基础设施
+
+### 本地开发（`docker-compose.yml`）
+
+项目根目录已提供 `docker-compose.yml`，包含 PostgreSQL 16 + Meilisearch 1.9：
+
+```bash
+docker compose up -d        # 启动
+docker compose down         # 停止（数据保留）
+docker compose down -v      # 停止并清除数据
+```
+
+| 服务 | 本地端口 | 说明 |
+|------|---------|------|
+| PostgreSQL | 5432 | 用户名/密码：`culturechain/localdev` |
+| Meilisearch | 7700 | Master Key：`localdevkey` |
+
+### 生产（`docker-compose.prod.yml`）
 
 ```yaml
-# docker-compose.prod.yml
 services:
   postgres:
     image: postgres:16
@@ -84,7 +99,7 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
 
   meilisearch:
-    image: getmeili/meilisearch:v1.6
+    image: getmeili/meilisearch:v1.9
     volumes:
       - meilidata:/meili_data
     environment:
