@@ -1,7 +1,7 @@
 # 快速启动指南
 
 本文档帮助你在本地从零启动 CultureChain 开发环境。
-**当前阶段：Phase 2 完成**，所有页面使用 mock 数据，无需真实区块链或数据库即可运行。
+**当前阶段：本地最小 Demo 可运行**。可以直接在本地 Hardhat 链完成铸造、上架、购买；数据库和外部服务默认 mock。
 
 ---
 
@@ -44,7 +44,7 @@ NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 ```bash
 # 4. 启动前端
-pnpm dev
+make web
 ```
 
 打开 http://localhost:3000 — 完成 🎉
@@ -89,20 +89,27 @@ pnpm db:studio
 ### 步骤 3：启动本地区块链
 
 ```bash
-# 终端 A：启动本地 Hardhat 节点
-pnpm --filter @culture-chain/contracts hardhat node
-
-# 终端 B：部署合约到本地节点
-pnpm contracts:deploy:local
+# 一条命令后台启动本地 Demo：
+# - Hardhat 本地链
+# - 本地合约部署
+# - Next.js 前端
+make demo-up
 ```
 
-部署完成后，将输出的合约地址填入 `.env.local`：
+如需分别控制，可使用：
 
 ```bash
-NEXT_PUBLIC_CONTRACT_CULTURE_NFT=0x5FbDB2315678afecb367f032d93F642f64180aa3
-NEXT_PUBLIC_CONTRACT_MARKETPLACE=0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
-NEXT_PUBLIC_CONTRACT_SHOP_REGISTRY=0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0
-# （以上为示例地址，实际以终端输出为准）
+make chain
+make deploy-local
+make web
+```
+
+日志统一输出到仓库根目录的 `./logs/`：
+
+```bash
+logs/hardhat-node.log
+logs/deploy-local.log
+logs/web.log
 ```
 
 ### 步骤 4：连接本地节点的 MetaMask 配置
@@ -120,7 +127,13 @@ NEXT_PUBLIC_CONTRACT_SHOP_REGISTRY=0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0
 ### 步骤 5：启动前端
 
 ```bash
-pnpm dev
+make demo-status
+```
+
+停止后台 Demo：
+
+```bash
+make demo-down
 ```
 
 ---
@@ -129,14 +142,17 @@ pnpm dev
 
 ```bash
 # ── 前端 ─────────────────────────────────────────────────────
-pnpm dev                     # 启动所有包的开发服务器
+make web                     # 启动前端
+make demo-up                 # 启动完整本地 demo
+make demo-down               # 停止本地 demo
+make demo-status             # 查看本地 demo 状态
 pnpm build                   # 构建生产版本
-pnpm typecheck               # TypeScript 类型检查
+make typecheck               # 前端 TypeScript 类型检查
 
 # ── 合约 ─────────────────────────────────────────────────────
-pnpm contracts:test          # 运行 76 个合约单元测试
+make contracts-test          # 运行 76 个合约单元测试
 pnpm contracts:compile       # 编译合约，生成 TypeChain 类型
-pnpm contracts:deploy:local  # 部署到本地 Hardhat 节点
+make deploy-local            # 部署到本地 Hardhat 节点
 pnpm contracts:deploy:mumbai # 部署到 Polygon Mumbai 测试网
 
 # ── 数据库 ───────────────────────────────────────────────────
@@ -192,6 +208,9 @@ const works: Work[] = json.data
 
 **Q：`pnpm dev` 后访问页面报 500**
 > 检查 `.env.local` 是否存在。若没有，执行 `cp .env.local.example .env.local`。
+
+**Q：后台启动后想看日志**
+> 统一查看 `./logs/` 目录，或执行 `make demo-status` 确认进程状态。
 
 **Q：合约测试在 WSL2 下失败**
 > 在 `apps/contracts` 目录内单独运行 `pnpm hardhat test`，而不要用根目录的 `pnpm test`。

@@ -1,6 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   transpilePackages: ["@culture-chain/ui", "@culture-chain/sdk"],
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...(config.resolve.alias ?? {}),
+      "@react-native-async-storage/async-storage": false,
+      "pino-pretty": false,
+    }
+
+    return config
+  },
   images: {
     remotePatterns: [
       {

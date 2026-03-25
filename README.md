@@ -26,19 +26,13 @@ pnpm install
 
 # 复制环境变量
 cp .env.example .env.local
-# 编辑 .env.local 填写配置项
-
-# 启动数据库
-docker-compose up -d postgres
-
-# 数据库迁移
-pnpm db:migrate
-
-# 启动开发服务器
-pnpm dev
+# 本地最小 demo（自动启动本地链、部署合约、启动前端）
+make demo-up
 ```
 
 访问 http://localhost:3000
+
+日志统一输出到 `./logs/`，停止服务使用 `make demo-down`。
 
 ## 文档目录
 
