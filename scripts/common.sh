@@ -147,10 +147,6 @@ port_pids() {
     raw="$(ss -ltnp "( sport = :$port )" 2>/dev/null | awk -F 'pid=' 'NR > 1 && NF > 1 {split($2, a, ","); print a[1]}' || true)"
   fi
 
-  if [[ -z "$raw" ]] && command -v fuser >/dev/null 2>&1; then
-    raw="$(fuser ${port}/tcp 2>/dev/null || true)"
-  fi
-
   printf '%s' "$raw" | tr ' ' '
 ' | sed '/^$/d' | sort -u | tr '
 ' ' ' | sed 's/[[:space:]]*$//'

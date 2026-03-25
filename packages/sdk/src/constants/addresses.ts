@@ -23,9 +23,9 @@ export const CONTRACT_ADDRESSES = {
   },
   /** Hardhat Local (chainId: 31337) */
   31337: {
-    CultureNFT: envAddresses.CultureNFT ?? "0x3Aa5ebB10DC797CAC828524e59A333d0A371443c" as `0x${string}`,
-    Marketplace: envAddresses.Marketplace ?? "0xc6e7DF5E7b4f2A278906862b61205850344D4e7d" as `0x${string}`,
-    ShopRegistry: envAddresses.ShopRegistry ?? "0x68B1D87F95878fE05B998F19b66F4baba5De1aed" as `0x${string}`,
+    CultureNFT: envAddresses.CultureNFT ?? "0x4ed7c70F96B99c776995fB64377f0d4aB3B0e1C1" as `0x${string}`,
+    Marketplace: envAddresses.Marketplace ?? "0x322813Fd9A801c5507c9de605d63CEA4f2CE6c44" as `0x${string}`,
+    ShopRegistry: envAddresses.ShopRegistry ?? "0x59b670e9fA9D0A427751Af201D676719a970857b" as `0x${string}`,
   },
 } as const
 
