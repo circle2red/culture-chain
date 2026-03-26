@@ -1,6 +1,12 @@
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || ""
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  transpilePackages: ["@culture-chain/ui", "@culture-chain/sdk"],
+  output: "export",
+  trailingSlash: true,
+  transpilePackages: ["@culture-chain/ui"],
+  basePath,
+  assetPrefix: basePath || undefined,
   webpack: (config) => {
     config.resolve.alias = {
       ...(config.resolve.alias ?? {}),
@@ -11,6 +17,7 @@ const nextConfig = {
     return config
   },
   images: {
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: "https",
@@ -26,18 +33,12 @@ const nextConfig = {
         protocol: "https",
         hostname: "arweave.net",
       },
-      // 开发阶段 mock 数据图片（生产时可移除）
       {
         protocol: "https",
         hostname: "images.unsplash.com",
-      },
-    ],
-  },
-  experimental: {
-    serverActions: {
-      allowedOrigins: ["localhost:3000"],
-    },
-  },
+      }
+    ]
+  }
 }
 
 export default nextConfig

@@ -1,14 +1,12 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { waitForTransactionReceipt } from "wagmi/actions"
-import { useConfig } from "wagmi"
 import { Button } from "@/components/ui/Button"
-import { useBuyItem } from "@culture-chain/sdk"
+import { formatTokenAmountFromWei } from "@/lib/mockData"
+import { useDemoMarketStore } from "@/store/demo-market.store"
 import type { Work } from "./WorkCard"
 
-type TxStatus = "idle" | "confirm" | "pending" | "success" | "error"
+type TxStatus = "confirm" | "pending" | "success" | "error"
 
 interface BuyModalProps {
   work: Work
@@ -17,54 +15,43 @@ interface BuyModalProps {
 }
 
 export function BuyModal({ work, amount = 1, onClose }: BuyModalProps) {
-  const router = useRouter()
-  const config = useConfig()
-  const { buyItemAsync } = useBuyItem()
+  const buyWork = useDemoMarketStore((state) => state.buyWork)
   const [status, setStatus] = useState<TxStatus>("confirm")
-  const [txHash, setTxHash] = useState<string>()
+  const [receiptId, setReceiptId] = useState<string>()
   const [errorMsg, setErrorMsg] = useState<string>()
 
-  const totalWei  = BigInt(work.priceWei) * BigInt(amount)
-  const feeWei    = (totalWei * 25n) / 1000n            // 2.5%
-  const totalDisp = formatMatic(totalWei)
-  const feeDisp   = formatMatic(feeWei)
+  const totalWei = BigInt(work.priceWei) * BigInt(amount)
+  const feeWei = (totalWei * 25n) / 1000n
+  const totalDisp = formatTokenAmountFromWei(totalWei, 4)
+  const feeDisp = formatTokenAmountFromWei(feeWei, 4)
 
   async function handleBuy() {
     setStatus("pending")
-    try {
-      if (!work.listingId) {
-        throw new Error("This work does not have an active listing.")
-      }
+    setErrorMsg(undefined)
 
-      const hash = await buyItemAsync(
-        BigInt(work.listingId),
-        BigInt(amount),
-        BigInt(work.priceWei)
-      )
-      await waitForTransactionReceipt(config, { hash })
-      setTxHash(hash)
-      setStatus("success")
-      router.refresh()
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Transaction failed. Please try again."
-      setErrorMsg(msg)
+    await new Promise((resolve) => window.setTimeout(resolve, 900))
+
+    const result = buyWork(work.tokenId, amount)
+    if (!result.ok) {
+      setErrorMsg(result.error ?? "Mock checkout failed. Please try again.")
       setStatus("error")
+      return
     }
+
+    setReceiptId(`mock-${Date.now().toString(16)}`)
+    setStatus("success")
   }
 
   return (
-    /* Backdrop */
     <div
       className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 backdrop-blur-sm sm:items-center"
       onClick={(e) => e.target === e.currentTarget && status !== "pending" && onClose()}
     >
       <div className="w-full max-w-md animate-slide-up rounded-t-3xl border border-white/60 bg-[#fffcf7] p-6 shadow-2xl sm:rounded-2xl">
-
-        {/* ── Confirm ─────────────────────────────────────── */}
         {status === "confirm" && (
           <>
-            <h2 className="text-xl font-bold text-slate-950">Confirm purchase</h2>
-            <p className="mt-1 text-sm text-slate-500">Review the order details before you sign.</p>
+            <h2 className="text-xl font-bold text-slate-950">Confirm collection</h2>
+            <p className="mt-1 text-sm text-slate-500">This static demo simulates a SSU checkout in your browser.</p>
 
             <div className="mt-5 space-y-3 rounded-xl border border-slate-200 bg-white p-4">
               <Row label="Work" value={work.title} bold />
@@ -77,8 +64,7 @@ export function BuyModal({ work, amount = 1, onClose }: BuyModalProps) {
             </div>
 
             <p className="mt-3 text-xs text-slate-400">
-              Royalties are distributed automatically on secondary sales. By purchasing, you agree
-              to the platform terms for this demo environment.
+              No wallet signature is required. Inventory updates are stored in local browser state so the site remains fully static.
             </p>
 
             <div className="mt-5 flex gap-3">
@@ -86,42 +72,35 @@ export function BuyModal({ work, amount = 1, onClose }: BuyModalProps) {
                 Cancel
               </Button>
               <Button variant="primary" className="flex-1" onClick={handleBuy}>
-                Confirm
+                Pay with SSU
               </Button>
             </div>
           </>
         )}
 
-        {/* ── Pending ─────────────────────────────────────── */}
         {status === "pending" && (
           <div className="flex flex-col items-center gap-4 py-8">
             <div className="h-14 w-14 animate-spin rounded-full border-4 border-slate-200 border-t-amber-500" />
-            <p className="font-semibold text-slate-800">Transaction pending</p>
+            <p className="font-semibold text-slate-800">Processing mock checkout</p>
             <p className="text-center text-sm text-slate-500">
-              Confirm the request in your wallet. Onchain confirmation may take 10 to 30 seconds.
+              Updating the static demo inventory and generating a local receipt.
             </p>
           </div>
         )}
 
-        {/* ── Success ─────────────────────────────────────── */}
         {status === "success" && (
           <div className="flex flex-col items-center gap-4 py-8">
             <div className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100">
               <CheckIcon className="h-7 w-7 text-emerald-600" />
             </div>
-            <p className="text-xl font-bold text-slate-950">Purchase complete</p>
+            <p className="text-xl font-bold text-slate-950">Collection complete</p>
             <p className="text-center text-sm text-slate-500">
-              {work.title} has been transferred to your wallet.
+              {work.title} has been added to this browser's mock purchase history.
             </p>
-            {txHash && (
-              <a
-                href={`http://127.0.0.1:8545`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-address text-xs text-amber-700 hover:underline"
-              >
-                Tx hash: {txHash.slice(0, 10)}...{txHash.slice(-8)}
-              </a>
+            {receiptId && (
+              <p className="font-address text-xs text-amber-700">
+                Receipt: {receiptId}
+              </p>
             )}
             <Button variant="primary" className="mt-2 w-full" onClick={onClose}>
               Close
@@ -129,13 +108,12 @@ export function BuyModal({ work, amount = 1, onClose }: BuyModalProps) {
           </div>
         )}
 
-        {/* ── Error ───────────────────────────────────────── */}
         {status === "error" && (
           <div className="flex flex-col items-center gap-4 py-8">
             <div className="flex h-14 w-14 items-center justify-center rounded-full bg-red-100">
               <XIcon className="h-7 w-7 text-red-500" />
             </div>
-            <p className="font-semibold text-slate-900">Transaction failed</p>
+            <p className="font-semibold text-slate-900">Checkout failed</p>
             <p className="text-center text-sm text-slate-500">{errorMsg}</p>
             <div className="flex w-full gap-3">
               <Button variant="ghost" className="flex-1" onClick={onClose}>Cancel</Button>
@@ -159,11 +137,6 @@ function Row({
       </span>
     </div>
   )
-}
-
-function formatMatic(wei: bigint) {
-  const value = Number(wei) / 1e18
-  return `${value.toFixed(4)} ETH`
 }
 
 function CheckIcon({ className }: { className: string }) {

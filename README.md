@@ -1,56 +1,51 @@
-# CultureChain — Web3 文化作品交易平台
+# CultureChain — Static SSU Demo
 
-> 用区块链守护创作价值，让文化作品自由流转
+> 一个可直接部署到 GitHub Pages 的纯静态文化作品交易 Demo
 
-## 是什么
+## 特性
 
-CultureChain 是一个去中心化的文化作品交易市场，支持画作、书籍、影视、音乐等数字内容的发行与交易。创作者可以像开咸鱼店一样简单地上架作品，同时通过 NFT 技术实现版权确权、版税自动分配和二级市场流通。
+- 作品价格统一使用 `SSU`
+- 购买、铸造、库存变化都由浏览器本地 mock 状态驱动
+- 不依赖钱包、合约、数据库或后端 API
+- 可直接静态导出到 GitHub Pages
 
-## 核心价值
+SSU 参数：
 
-- **极简开店**：Web2 级别的操作体验，无需了解区块链也能发布作品
-- **版权上链**：作品哈希指纹和所有权记录在区块链，不可篡改
-- **自动版税**：二级市场每次转售，版税自动打回创作者钱包（ERC-2981）
-- **低成本**：运行在 Polygon 网络，Gas 费用极低（通常低于 $0.01）
-- **永久存储**：作品文件存储在 IPFS/Arweave，不依赖中心化服务器
+- `SSU_ADDRESS`: `0x4b451e0dafedaa119f9cb55eac19d7011051e1b7`
+- `SSU_DECIMALS`: `18`
+- Network: `Base`
 
-## 快速开始
+## 本地开发
 
 ```bash
-# 克隆项目
-git clone https://github.com/your-org/culture-chain.git
-cd culture-chain
-
-# 安装依赖（使用 pnpm）
 pnpm install
-
-# 复制环境变量
-cp .env.example .env.local
-# 本地最小 demo（自动启动本地链、部署合约、启动前端）
-make demo-up
+pnpm dev
 ```
 
-访问 http://localhost:3000
+打开 `http://localhost:3000`。
 
-日志统一输出到 `./logs/`，停止服务使用 `make demo-down`。
+## 构建静态站
 
-## 文档目录
+```bash
+pnpm build
+```
 
-- [架构设计](./docs/architecture.md)
-- [开发计划](./docs/development-plan.md)
-- [智能合约](./docs/smart-contracts.md)
-- [部署指南](./docs/deployment.md)
-- [快速启动](./docs/quickstart.md)
-- [Web3 特性与功能](./docs/web3-features.md)
+构建产物位于 `apps/web/out`。
 
-## 技术栈概览
+## GitHub Pages
 
-Next.js 14 · Tailwind CSS · wagmi v2 · Solidity · Hardhat · Polygon · IPFS · PostgreSQL
+仓库已包含自动部署工作流：
 
-## 贡献
+- `.github/workflows/deploy-pages.yml`
 
-见 [CONTRIBUTING.md](./CONTRIBUTING.md)
+行为：
 
-## 许可证
+- push 到 `main` 自动构建并发布
+- 自动根据仓库名设置 `basePath`
+- 发布目录为 `apps/web/out`
 
-MIT
+## 目录
+
+- `apps/web`: Next.js 静态 demo
+- `packages/ui`: 共用 UI 组件和全局样式
+- `packages/config`: TS / ESLint 基础配置

@@ -2,22 +2,13 @@
   "name": "culture-chain",
   "private": true,
   "scripts": {
-    "dev": "turbo dev",
-    "build": "turbo build",
-    "lint": "turbo lint",
-    "test": "turbo test",
-    "typecheck": "turbo typecheck",
-    "clean": "turbo clean && rm -rf node_modules",
-    "contracts:compile": "pnpm --filter @culture-chain/contracts compile",
-    "contracts:test": "pnpm --filter @culture-chain/contracts test",
-    "contracts:deploy:local": "pnpm --filter @culture-chain/contracts deploy:local",
-    "contracts:deploy:mumbai": "pnpm --filter @culture-chain/contracts deploy:mumbai",
-    "db:migrate": "pnpm --filter @culture-chain/web db:migrate",
-    "db:studio": "pnpm --filter @culture-chain/web db:studio",
+    "dev": "pnpm --filter @culture-chain/web dev",
+    "build": "pnpm --filter @culture-chain/web build",
+    "typecheck": "pnpm --filter @culture-chain/web typecheck",
+    "clean": "rm -rf node_modules apps/web/.next apps/web/out",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,yaml,md}\" --ignore-path .gitignore"
   },
   "devDependencies": {
-    "turbo": "^2.0.0",
     "prettier": "^3.3.0",
     "typescript": "^5.5.0"
   },

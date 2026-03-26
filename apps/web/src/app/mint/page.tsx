@@ -9,7 +9,7 @@ export default function MintPage() {
         <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">Creator studio</p>
         <h1 className="mt-2 text-4xl font-bold text-slate-950 sm:text-5xl">Mint a new cultural release</h1>
         <p className="mt-3 text-base text-slate-600">
-          Prepare the listing, set pricing and royalties, then publish it straight to the demo chain.
+          Prepare artwork, set a price in SSU, and publish a browser-local mock release that works in a fully static deployment.
         </p>
       </div>
       <MintWizard />
